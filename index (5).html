@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ISU-CC Parking</title>
+  <style>
+    body {
+      font-family: sans-serif;
+    }
+
+    .parking-lot {
+      display: grid;
+      grid-template-columns: repeat(10, 50px);
+      grid-template-rows: repeat(15, 50px);
+      gap: 5px;
+    }
+
+    .parking-spot {
+      width: 50px;
+      height: 50px;
+      border: 1px solid #ccc;
+      text-align: center;
+      line-height: 50px;
+      cursor: pointer;
+      background-color: #fff;
+      transition: background-color 0.3s;
+    }
+
+    .parking-spot.taken {
+      background-color: red;
+    }
+
+    .parking-spot.available {
+      background-color: transparent;
+    }
+
+    .popup {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+      z-index: 100;
+    }
+
+    .popup input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    .popup button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<h1>ISU-CC Parking</h1>
+<div class="parking-lot">
+  </div>
+
+<div class="popup" id="parkingPopup">
+  <h2>Parking Spot Information</h2>
+  <label for="name">Name:</label>
+  <input type="text" id="name" name="name">
+  <label for="id">ID Number:</label>
+  <input type="text" id="id" name="id">
+  <button id="submitParking">Submit</button>
+</div>
+
+<script>
+  const parkingLot = document.querySelector('.parking-lot');
+  const parkingPopup = document.getElementById('parkingPopup');
+  const submitParkingButton = document.getElementById('submitParking');
+
+  // Array to store parking spot status (taken/available)
+  const parkingSpots = Array(150).fill(false); // Initially all spots are available
+
+  // Function to create parking spots
+  function createParkingSpots() {
+    for (let i = 1; i <= 150; i++) {
+      const spot = document.createElement('div');
+      spot.classList.add('parking-spot');
+      spot.textContent = i;
+      spot.addEventListener('click', () => handleParkingSpotClick(i));
+      parkingLot.appendChild(spot);
+    }
+  }
+
+  // Function to handle parking spot click
+  function handleParkingSpotClick(spotNumber) {
+    if (parkingSpots[spotNumber - 1]) {
+      // Spot is taken, show exit popup
+      parkingPopup.querySelector('h2').textContent = 'Exit Parking Spot';
+      parkingPopup.querySelector('#submitParking').textContent = 'Exit';
+      parkingPopup.querySelector('#submitParking').onclick = () => handleExit(spotNumber);
+    } else {
+      // Spot is available, show parking information popup
+      parkingPopup.querySelector('h2').textContent = 'Parking Spot Information';
+      parkingPopup.querySelector('#submitParking').textContent = 'Submit';
+      parkingPopup.querySelector('#submitParking').onclick = () => handleParking(spotNumber);
+    }
+    parkingPopup.style.display = 'block';
+  }
+
+  // Function to handle parking submission
+  function handleParking(spotNumber) {
+    // Get name and ID from input fields
+    const name = document.getElementById('name').value;
+    const id = document.getElementById('id').value;
+
+    // Check if name and ID are valid (you can add validation here)
+    if (name && id) {
+      // Mark spot as taken
+      parkingSpots[spotNumber - 1] = true;
+
+      // Update spot visual
+      const spot = parkingLot.children[spotNumber - 1];
+      spot.classList.add('taken');
+
+      // Close popup
+      parkingPopup.style.display = 'none';
+    }
+  }
+
+  // Function to handle exit
+  function handleExit(spotNumber) {
+    // Mark spot as available
+    parkingSpots[spotNumber - 1] = false;
+
+    // Update spot visual
+    const spot = parkingLot.children[spotNumber - 1];
+    spot.classList.remove('taken');
+    spot.classList.add('available');
+
+    // Close popup
+    parkingPopup.style.display = 'none';
+  }
+
+  // Initialize parking spots
+  createParkingSpots();
+</script>
+
+</body>
+</html>
